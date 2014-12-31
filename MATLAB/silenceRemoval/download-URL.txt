@@ -1,0 +1,1 @@
+http://www.mathworks.com/matlabcentral/fileexchange/28826-silence-removal-in-speech-signals

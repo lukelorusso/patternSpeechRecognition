@@ -1,0 +1,204 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>EXTRACTFEATURES</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-12-01"><meta name="DC.source" content="extractFeatures.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>EXTRACTFEATURES</h1><!--introduction--><p>Calculates Mel Frequency Cepstral Coefficients from WAV files and saves them to an Nx1 struct array as output (where N is the number of files in sample folder).</p><pre>ARGUMENTS:
+- samplesPath: [string] the path where sample WAV files are stored</pre><pre>OUTPUT:
+- featuresList: a struct array Nx1 with fields {name, date, bytes,
+                isdir, datenum, typeClass, MFCC} for each WAV file in
+                "samplesPath"
+- model:        a model struct array Nx1 with fields {typeClass, MFCC}
+                for each word of the vocabulary</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Copyright (C) Luca Lorusso 2014 - Sapienza Universita' di Roma</a></li><li><a href="#2">Initializing data</a></li><li><a href="#4">Mel Frequency Cepstral Coefficient extraction: <i>fileFeatures</i></a></li><li><a href="#5">Dynamic Time Warping and Multivariate Gaussian Mixture Models calculation: <i>model</i></a></li></ul></div><h2>Copyright (C) Luca Lorusso 2014 - Sapienza Universita' di Roma<a name="1"></a></h2><p>DETECTVOICED is a MATLAB function from SILENCEREMOVAL, a method for silence removal and segmentation of audio streams that contain speech.   Home page: <a href="http://www.mathworks.com/matlabcentral/fileexchange/28826-silence-removal-in-speech-signals">http://www.mathworks.com/matlabcentral/fileexchange/28826-silence-removal-in-speech-signals</a></p><p>MELCEPST is a MATLAB function from VOICEBOX, a library for speech processing.   Home page: <a href="http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html">http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html</a></p><h2>Initializing data<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> [model, fileFeatures] = extractFeatures(samplesPath)
+</pre><pre class="codeinput">    <span class="keyword">if</span> nargin == 0
+        samplesPath = <span class="string">''</span>;
+    <span class="keyword">end</span>
+    fileFeatures = dir(fullfile(samplesPath, <span class="string">'*.wav'</span>));
+    <span class="keyword">if</span> size(fileFeatures, 1) == 0
+        error(<span class="string">'No WAV files here. EXITING!'</span>);
+    <span class="keyword">end</span>
+    typeClassArray{1} = <span class="string">''</span>; <span class="comment">% creating cell array of strings</span>
+    typeClassCount = 1;
+</pre><h2>Mel Frequency Cepstral Coefficient extraction: <i>fileFeatures</i><a name="4"></a></h2><pre class="codeinput">    fprintf(<span class="string">'Extracting MFCC feature matrices...\n'</span>);
+    <span class="keyword">for</span> fileCount = 1 : size(fileFeatures, 1)
+        <span class="comment">% filling _fileFeatures_ struct array</span>
+        tempFileName = fileFeatures(fileCount).name; <span class="comment">% getting file name</span>
+        fileFeatures(fileCount).typeClass = tempFileName(4:size(tempFileName, 2)-4); <span class="comment">% getting instances' class from file name</span>
+        [wavSignal,sampleRate] = audioread(fullfile(samplesPath, fileFeatures(fileCount).name)); <span class="comment">% loading sound from WAV file</span>
+        wavSignal = detectVoiced(wavSignal, sampleRate); <span class="comment">% removing silence from the signal</span>
+        fileFeatures(fileCount).MFCC = melcepst(wavSignal, sampleRate); <span class="comment">% MFCC features extraction</span>
+
+        <span class="comment">% filling _typeClass_ field of _model_</span>
+        [typeClassAns] = ismember(fileFeatures(fileCount).typeClass, typeClassArray);
+        <span class="keyword">if</span> typeClassAns == 0 <span class="comment">% if the current typeClass still does NOT exists</span>
+            typeClassArray{typeClassCount} = fileFeatures(fileCount).typeClass; <span class="comment">% CAN'T PREALLOCATE!</span>
+            typeClassCount = typeClassCount + 1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><pre class="codeoutput">Extracting MFCC feature matrices...
+</pre><h2>Dynamic Time Warping and Multivariate Gaussian Mixture Models calculation: <i>model</i><a name="5"></a></h2><pre class="codeinput">    fprintf(<span class="string">'Calculating DTW distances and Gaussian mixture models...\n'</span>);
+    <span class="keyword">for</span> typeClassCount = 1 : size(typeClassArray, 2)
+        <span class="comment">% for each word of the vocabulary creates a selection of _fileFeatures_</span>
+        typeClassIndices = find(strcmp({fileFeatures.typeClass}, typeClassArray(typeClassCount)));
+        model(typeClassCount) = modelingR(fileFeatures(typeClassIndices)); <span class="comment">% DIFFERENT MODELING ALGORITHMS: use _modelingS_ or _modelingR_</span>
+    <span class="keyword">end</span>
+    model = model';
+    fprintf(<span class="string">'OK, done!\n'</span>);
+</pre><pre class="codeoutput">Calculating DTW distances and Gaussian mixture models...
+OK, done!
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeoutput">
+model = 
+
+10x1 struct array with fields:
+
+    typeClass
+    MFCC
+
+
+fileFeatures = 
+
+90x1 struct array with fields:
+
+    name
+    date
+    bytes
+    isdir
+    datenum
+    typeClass
+    MFCC
+
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% EXTRACTFEATURES
+% Calculates Mel Frequency Cepstral Coefficients from WAV files and saves
+% them to an Nx1 struct array as output (where N is the number of files in
+% sample folder).
+%
+%  ARGUMENTS:
+%  - samplesPath: [string] the path where sample WAV files are stored
+%
+%  OUTPUT:
+%  - featuresList: a struct array Nx1 with fields {name, date, bytes,
+%                  isdir, datenum, typeClass, MFCC} for each WAV file in
+%                  "samplesPath"
+%  - model:        a model struct array Nx1 with fields {typeClass, MFCC}
+%                  for each word of the vocabulary
+%
+%% Copyright (C) Luca Lorusso 2014 - Sapienza Universita' di Roma
+%
+% DETECTVOICED is a MATLAB function from SILENCEREMOVAL, a method for
+% silence removal and segmentation of audio streams that contain speech.
+%   Home page: <http://www.mathworks.com/matlabcentral/fileexchange/28826-silence-removal-in-speech-signals>
+%
+% MELCEPST is a MATLAB function from VOICEBOX, a library for speech
+% processing.
+%   Home page: <http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html>
+%
+
+%% Initializing data
+function [model, fileFeatures] = extractFeatures(samplesPath)
+    if nargin == 0
+        samplesPath = '';
+    end
+    fileFeatures = dir(fullfile(samplesPath, '*.wav'));
+    if size(fileFeatures, 1) == 0
+        error('No WAV files here. EXITING!');
+    end
+    typeClassArray{1} = ''; % creating cell array of strings
+    typeClassCount = 1;
+    
+    %% Mel Frequency Cepstral Coefficient extraction: _fileFeatures_
+    fprintf('Extracting MFCC feature matrices...\n');
+    for fileCount = 1 : size(fileFeatures, 1)
+        % filling _fileFeatures_ struct array
+        tempFileName = fileFeatures(fileCount).name; % getting file name
+        fileFeatures(fileCount).typeClass = tempFileName(4:size(tempFileName, 2)-4); % getting instances' class from file name
+        [wavSignal,sampleRate] = audioread(fullfile(samplesPath, fileFeatures(fileCount).name)); % loading sound from WAV file
+        wavSignal = detectVoiced(wavSignal, sampleRate); % removing silence from the signal
+        fileFeatures(fileCount).MFCC = melcepst(wavSignal, sampleRate); % MFCC features extraction
+        
+        % filling _typeClass_ field of _model_
+        [typeClassAns] = ismember(fileFeatures(fileCount).typeClass, typeClassArray);
+        if typeClassAns == 0 % if the current typeClass still does NOT exists
+            typeClassArray{typeClassCount} = fileFeatures(fileCount).typeClass; % CAN'T PREALLOCATE!
+            typeClassCount = typeClassCount + 1;
+        end
+    end
+    
+    %% Dynamic Time Warping and Multivariate Gaussian Mixture Models calculation: _model_
+    fprintf('Calculating DTW distances and Gaussian mixture models...\n');
+    for typeClassCount = 1 : size(typeClassArray, 2)
+        % for each word of the vocabulary creates a selection of _fileFeatures_
+        typeClassIndices = find(strcmp({fileFeatures.typeClass}, typeClassArray(typeClassCount)));
+        model(typeClassCount) = modelingR(fileFeatures(typeClassIndices)); % DIFFERENT MODELING ALGORITHMS: use _modelingS_ or _modelingR_
+    end
+    model = model';
+    fprintf('OK, done!\n');
+end
+
+##### SOURCE END #####
+--></body></html>

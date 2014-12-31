@@ -1,0 +1,211 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>SPEECHRECOGNITION</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-12-01"><meta name="DC.source" content="speechRecognition.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>SPEECHRECOGNITION</h1><!--introduction--><p>A MATLAB simulation of speech recognition based on Mel Frequency Cepstral Coefficients as extracted feature and Dynamc Time Warping as similarity measurement</p><pre>ARGUMENTS:
+- featuresList: a struct array Nx1 with fields {name, date, bytes,
+                isdir, atenum, mfcc} for each WAV sample file
+- audioFile: (optional) [string] the path of WAV file to process; if not
+             specified an audio signal will be recorded</pre><pre>OUTPUT:
+- class:       [string] the recognised class of "audioFile"
+- minDistance: minimal Dynamc Time Warping distance from a sample file
+- indexOfMin:  index of the sample file with minimal DTW distance in
+               "fileList"</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Copyright (C) Luca Lorusso 2014 - Sapienza Universita' di Roma</a></li><li><a href="#2">Initializing data</a></li><li><a href="#4">WAV file Mel Frequency Cepstral Coefficient calculation</a></li><li><a href="#5">Processing samples with Dynamic Time Warping algorithm</a></li><li><a href="#6">Finding result</a></li></ul></div><h2>Copyright (C) Luca Lorusso 2014 - Sapienza Universita' di Roma<a name="1"></a></h2><p>DETECTVOICED is a MATLAB function from SILENCEREMOVAL, a method for silence removal and segmentation of audio streams that contain speech.   Home page: <a href="http://www.mathworks.com/matlabcentral/fileexchange/28826-silence-removal-in-speech-signals">http://www.mathworks.com/matlabcentral/fileexchange/28826-silence-removal-in-speech-signals</a></p><p>DTW is a MATLAB function from MATCHBOX, a prototype which applies Dynamic Time Warping on MFCC features in order to compare two spoken words for similarity.   Home page: <a href="https://github.com/hfink/matchbox/tree/master/matlab">https://github.com/hfink/matchbox/tree/master/matlab</a></p><p>MELCEPST is a MATLAB function from VOICEBOX, a library for speech processing.   Home page: <a href="http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html">http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html</a></p><h2>Initializing data<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> [class, minDistance, indexOfMin] = speechRecognition(model, audioFile)
+</pre><pre class="codeinput">    <span class="keyword">if</span> nargin &gt; 1 <span class="comment">% open audio file</span>
+        <span class="keyword">if</span> exist(audioFile, <span class="string">'file'</span>)
+            [targetSignal,sampleRate] = audioread(audioFile);
+        <span class="keyword">else</span>
+            error(<span class="string">'Audio file does not exist. EXITING!'</span>);
+        <span class="keyword">end</span>
+    <span class="keyword">else</span> <span class="comment">% record a sound if no file is specified</span>
+        sampleRate = 22050;
+        localRecorder = audiorecorder(sampleRate, 16, 1);
+        localRecorder.StartFcn = <span class="string">'disp(''SPEAK NOW!!!'')'</span>;
+        localRecorder.StopFcn = <span class="string">'disp(''End of recording.'')'</span>;
+
+        <span class="comment">% recording sound from local recorder sound system</span>
+        seconds = 2;
+        fprintf(<span class="string">'Press a key when you want to speak! (%i sec)\n'</span>, seconds);
+        pause;
+        recordblocking(localRecorder, seconds);
+        targetSignal = getaudiodata(localRecorder);
+    <span class="keyword">end</span>
+    window_size = 15; <span class="comment">% WHAT IS THE BEST VALUE?</span>
+    <span class="comment">% at this point we have an audio signal... otherwise the function is already terminated!</span>
+</pre><h2>WAV file Mel Frequency Cepstral Coefficient calculation<a name="4"></a></h2><pre class="codeinput">    targetSignal = detectVoiced(targetSignal, sampleRate); <span class="comment">% removing silence from the signal</span>
+    <span class="keyword">if</span> size(targetSignal, 1) &gt; 1 <span class="comment">% if it is not a silence signal</span>
+        MFCC = melcepst(targetSignal, sampleRate); <span class="comment">% MFCC features extraction</span>
+    <span class="keyword">else</span>
+        error(<span class="string">'No voice detected. EXITING!'</span>);
+    <span class="keyword">end</span>
+</pre><h2>Processing samples with Dynamic Time Warping algorithm<a name="5"></a></h2><pre class="codeinput">    fprintf(<span class="string">'Calculating Dynamic Time Warping... '</span>);
+    <span class="keyword">for</span> fileCount = 1 : size(model, 1)
+        allDistances(fileCount) = dtw(model(fileCount).MFCC', MFCC', window_size);
+    <span class="keyword">end</span>
+</pre><pre class="codeoutput">Calculating Dynamic Time Warping... </pre><h2>Finding result<a name="6"></a></h2><pre class="codeinput">    [minDistance, indexOfMin] = min(allDistances);
+    class = model(indexOfMin).typeClass;
+    <span class="comment">%soundsc(targetSignal, sampleRate); % uncomment this to listen input file</span>
+    fprintf(<span class="string">'OK, done!\n'</span>);
+</pre><pre class="codeoutput">OK, done!
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeoutput">
+class =
+
+sposta
+
+
+minDistance =
+
+    4.5479
+
+
+indexOfMin =
+
+     6
+
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% SPEECHRECOGNITION
+% A MATLAB simulation of speech recognition based on Mel Frequency 
+% Cepstral Coefficients as extracted feature and Dynamc Time Warping as
+% similarity measurement
+%
+%  ARGUMENTS:
+%  - featuresList: a struct array Nx1 with fields {name, date, bytes,
+%                  isdir, atenum, mfcc} for each WAV sample file
+%  - audioFile: (optional) [string] the path of WAV file to process; if not
+%               specified an audio signal will be recorded
+%
+%  OUTPUT:
+%  - class:       [string] the recognised class of "audioFile"
+%  - minDistance: minimal Dynamc Time Warping distance from a sample file
+%  - indexOfMin:  index of the sample file with minimal DTW distance in
+%                 "fileList"
+%
+%% Copyright (C) Luca Lorusso 2014 - Sapienza Universita' di Roma
+%
+% DETECTVOICED is a MATLAB function from SILENCEREMOVAL, a method for
+% silence removal and segmentation of audio streams that contain speech.
+%   Home page: <http://www.mathworks.com/matlabcentral/fileexchange/28826-silence-removal-in-speech-signals>
+%
+% DTW is a MATLAB function from MATCHBOX, a prototype which applies Dynamic
+% Time Warping on MFCC features in order to compare two spoken words for
+% similarity.
+%   Home page: <https://github.com/hfink/matchbox/tree/master/matlab>
+%
+% MELCEPST is a MATLAB function from VOICEBOX, a library for speech
+% processing.
+%   Home page: <http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html>
+%
+
+%% Initializing data
+function [class, minDistance, indexOfMin] = speechRecognition(model, audioFile)
+    if nargin > 1 % open audio file
+        if exist(audioFile, 'file')
+            [targetSignal,sampleRate] = audioread(audioFile);
+        else
+            error('Audio file does not exist. EXITING!');
+        end
+    else % record a sound if no file is specified
+        sampleRate = 22050;
+        localRecorder = audiorecorder(sampleRate, 16, 1);
+        localRecorder.StartFcn = 'disp(''SPEAK NOW!!!'')';
+        localRecorder.StopFcn = 'disp(''End of recording.'')';
+
+        % recording sound from local recorder sound system
+        seconds = 2;
+        fprintf('Press a key when you want to speak! (%i sec)\n', seconds);
+        pause;
+        recordblocking(localRecorder, seconds);
+        targetSignal = getaudiodata(localRecorder);
+    end
+    window_size = 15; % WHAT IS THE BEST VALUE?
+    % at this point we have an audio signal... otherwise the function is already terminated!
+    
+    %% WAV file Mel Frequency Cepstral Coefficient calculation
+    targetSignal = detectVoiced(targetSignal, sampleRate); % removing silence from the signal
+    if size(targetSignal, 1) > 1 % if it is not a silence signal
+        MFCC = melcepst(targetSignal, sampleRate); % MFCC features extraction
+    else
+        error('No voice detected. EXITING!');
+    end
+    
+    %% Processing samples with Dynamic Time Warping algorithm
+    fprintf('Calculating Dynamic Time Warping... ');
+    for fileCount = 1 : size(model, 1)
+        allDistances(fileCount) = dtw(model(fileCount).MFCC', MFCC', window_size);
+    end
+    
+    %% Finding result
+    [minDistance, indexOfMin] = min(allDistances);
+    class = model(indexOfMin).typeClass;
+    soundsc(targetSignal, sampleRate);
+    fprintf('OK, done!\n');
+end
+
+##### SOURCE END #####
+--></body></html>
